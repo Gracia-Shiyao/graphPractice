@@ -8,24 +8,25 @@ using namespace std;
 
 class DirectGraph : protected Graph {
 	
-	void DFSUtil(int v, bool visited[]);
+//	void DFSUtil(int v, bool visited[]);
 //	void topoSortUtil(int v, bool visited[], stack<int>& S);
-	bool isCyclicUtil(int v, bool visited[], bool *rs);
+//	bool isCyclicUtil(int v, bool visited[], bool *rs);
 public:
 	DirectGraph(int v) :Graph(v) {
 	};
-	void addEdge(int v, int w);
-	void DFS(int v); //start point of dfs
+	void addEdge(int u, int v, int w);
+/*	void DFS(int v); //start point of dfs
 	void DFS();
 	void BFS(int v); //start with vertex v
 	void topologicalSort();
 	bool isCyclic(); //return true if there is a cycle in this graph
+	*/
 };          
 
-void DirectGraph::addEdge(int v, int w) {
-	adj[v].push_back(w);
+void DirectGraph::addEdge(int u, int v, int w) {
+	adj[u].push_back(make_pair(v, w));
 }
-
+/*
 void DirectGraph::DFSUtil(int v, bool visited[]) {
 	//Mark the current node as visitd and print it
 	visited[v] = true;
@@ -83,7 +84,7 @@ void DirectGraph::BFS(int s) {
 			}
 		}
 	} //enddo
-}
+} */
 /*In recursive topoSort method, for each vertex v, first we recursively call
   topoSortUtil on its adjcent vertex which are not visited yet, push them into stack.
   After reviewing all adjacent vertex, push the vertex v into stack.
@@ -128,6 +129,7 @@ void DirectGraph::topologicalSort() {
 }
 */
 /*Kahn's algorithm for topological sort*/
+/*
 void DirectGraph::topologicalSort() {
 	//create a vector to store in-degree of all vertices. Initialize all 0
 	vector<int> in_degree(V, 0);
@@ -208,6 +210,7 @@ bool DirectGraph::isCyclic() {
 	}
 	return false;
 }
+*/
 /*
 int main() {
 	DirectGraph g{ 4 };
