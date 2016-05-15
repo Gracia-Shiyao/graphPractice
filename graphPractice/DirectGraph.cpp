@@ -10,6 +10,7 @@ class DirectGraph : protected Graph {
 	
 	void DFSUtil(int v, bool visited[]);
 //	void topoSortUtil(int v, bool visited[], stack<int>& S);
+	bool isCyclicUtil(int v, bool visited[], bool *rs);
 public:
 	DirectGraph(int v) :Graph(v) {
 	};
@@ -18,6 +19,7 @@ public:
 	void DFS();
 	void BFS(int v); //start with vertex v
 	void topologicalSort();
+	bool isCyclic(); //return true if there is a cycle in this graph
 };
 
 void DirectGraph::addEdge(int v, int w) {
@@ -170,14 +172,50 @@ void DirectGraph::topologicalSort() {
 	}
 	cout << endl;
 }
+bool DirectGraph::isCyclicUtil(int v, bool visited[], bool *rs) {
+	if (visited[v] == false) {
+		//mark the current node as visited and part of the recusion stack
+		visited[v] = true;
+		rs[v] = true;
+
+		list<int>::iterator i;
+		for (i = adj[v].begin(); i != adj[v].end(); ++i) {
+			if (!visited[*i] && isCyclicUtil(*i, visited, rs))
+				return true;
+			else if (rs[*i]) {
+				return true;
+			}
+		}
+	}
+	rs[v] = false;
+	return false;
+}
+bool DirectGraph::isCyclic() {
+	//mark all the vertices as not visited and not part of the recursion
+	bool * visited = new bool[V];
+	bool * recStack = new bool[V];
+
+	for (int i = 0; i < V; ++i) {
+		visited[i] = false;
+		recStack[i] = false;
+	}
+
+	//Call the recursive helper function to detect cycle in different DFS trees
+	for (int i = 0; i < V; ++i) {
+		if (isCyclicUtil(i, visited, recStack)) {
+			return true;
+		}
+	}
+	return false;
+}
 int main() {
-	DirectGraph g{ 6 };
-	g.addEdge(5, 2);
-	g.addEdge(5, 0);
-	g.addEdge(4, 0);
-	g.addEdge(4, 1);
+	DirectGraph g{ 4 };
+	g.addEdge(0, 1);
+	g.addEdge(0, 2);
+	g.addEdge(1, 2);
+	g.addEdge(2, 0);
 	g.addEdge(2, 3);
-	g.addEdge(3, 1);
+	g.addEdge(3, 3);
 
 	cout << "\n DFS1:\n";
 	g.DFS(2);
@@ -187,4 +225,11 @@ int main() {
 	g.BFS(2);
 	cout << "\n Topological Sort: \n";
 	g.topologicalSort();
+	
+	bool isC = g.isCyclic();
+	cout << "\n IsCyclic? \n";
+	if (isC)
+		cout << "Yes";
+	else
+		cout << "No";
 }
