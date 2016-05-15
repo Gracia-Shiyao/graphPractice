@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="DirectGraph.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="UndirectGraph.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

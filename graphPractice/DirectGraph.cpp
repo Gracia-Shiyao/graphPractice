@@ -20,7 +20,7 @@ public:
 	void BFS(int v); //start with vertex v
 	void topologicalSort();
 	bool isCyclic(); //return true if there is a cycle in this graph
-};
+};          
 
 void DirectGraph::addEdge(int v, int w) {
 	adj[v].push_back(w);
@@ -208,6 +208,7 @@ bool DirectGraph::isCyclic() {
 	}
 	return false;
 }
+/*
 int main() {
 	DirectGraph g{ 4 };
 	g.addEdge(0, 1);
@@ -233,3 +234,4 @@ int main() {
 	else
 		cout << "No";
 }
+*/
