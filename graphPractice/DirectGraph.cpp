@@ -3,6 +3,8 @@
 #include <queue>
 #include <stack>
 #include <vector>
+#include <climits>
+#include <cstdio>
 #include "Graph.h"
 using namespace std;
 
@@ -15,6 +17,7 @@ public:
 	DirectGraph(int v) :Graph(v) {
 	};
 	void addEdge(int u, int v, int w);
+	void bellmanfordShortestPath(int s);
 /*	void DFS(int v); //start point of dfs
 	void DFS();
 	void BFS(int v); //start with vertex v
@@ -25,6 +28,46 @@ public:
 
 void DirectGraph::addEdge(int u, int v, int w) {
 	adj[u].push_back(make_pair(v, w));
+}
+
+void DirectGraph::bellmanfordShortestPath(int src) {
+	int * dist = new int[V];
+
+	for (int i = 0; i < V; ++i) {
+		dist[i] = INT_MAX;
+	}
+	dist[src] = 0;
+
+	//step 2, relax all edges V - 1 times. because a simple
+	// shortest path from src to any other vertex can have
+	// at-most V-1 edges
+	for (int t = 1; t <= V - 1; t++) {
+		for (int n = 0; n < V; n++) {
+			list<pair<int, int>>::iterator i;
+			for (i = adj[n].begin(); i != adj[n].end(); i++) { //for each edge n->v, weight is w
+				int v = (*i).first;
+				int w = (*i).second;
+
+				if (dist[n] != INT_MAX && dist[v] > dist[n] + w)
+					dist[v] = dist[n] + w;
+			}
+		}
+	}
+	//step 3, check for negative-weight cycles. 
+	for (int u = 0; u < V; ++u) {
+		list<pair<int, int>>::iterator i;
+		for (i = adj[u].begin(); i != adj[u].end(); ++i) {
+			int v = (*i).first;
+			int w = (*i).second;
+			if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+				cout << "Graph contains negative weight cycle\n";
+			}
+		}
+	}
+	//print result
+	for (int u = 0; u < V; u++) {
+		printf("%d \t\t %d\n", u, dist[u]);
+	}
 }
 /*
 void DirectGraph::DFSUtil(int v, bool visited[]) {
@@ -238,3 +281,17 @@ int main() {
 		cout << "No";
 }
 */
+
+int main() {
+	DirectGraph g{ 5 };
+	g.addEdge(0, 1, -1);
+	g.addEdge(0, 2, 4);
+	g.addEdge(1, 2, 3);
+	g.addEdge(1, 3, 2);
+	g.addEdge(1, 4, 2);
+	g.addEdge(3, 1, 1);
+	g.addEdge(3, 2, 5);
+	g.addEdge(4, 3, -3);
+
+	g.bellmanfordShortestPath(0);
+}
