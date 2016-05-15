@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 #include "Graph.h"
 
 using namespace std;
@@ -9,6 +10,7 @@ public:
 	UndirectedGraph(int v) :Graph(v) {};
 	void addEdge(int v, int w);
 	bool isCyclic(); //return true if there is cycle in graph
+	bool isReachable(int s, int d);
 };
 
 void UndirectedGraph::addEdge(int v, int w) {
@@ -26,7 +28,7 @@ bool UndirectedGraph::isCyclicUtil(int v, bool visited[], int parent) {
 				return true;
 			}
 		}
-		else if (*i != parent)
+		else if (*i != parent) 
 			return true;
 	}
 	return false;
@@ -50,6 +52,36 @@ bool* visited = new bool[V];
 	return false;
 }
 
+bool UndirectedGraph::isReachable(int s, int d) {
+	if (s == d) return true;
+
+	bool * visited = new bool[V];
+	for (int i = 0; i < V; ++i) {
+		visited[i] = false;
+	}
+	//queue for BFS
+	queue<int> q;
+
+	visited[s] = true;
+	q.push(s);
+
+	list<int>::iterator i;
+	while (!q.empty()) {
+		s = q.front();
+		q.pop();
+
+		for (i = adj[s].begin(); i != adj[s].end(); ++i) {
+			if (*i == d)
+				return true;
+			//else, continue to do BFS
+			if (!visited[*i]) {
+				visited[*i] = true;
+				q.push(*i);
+			}
+		}
+	}
+	return false;
+}
 int main() {
 	UndirectedGraph g{ 5 };
 	g.addEdge(0, 1);
@@ -64,4 +96,11 @@ int main() {
 		cout << "Yes";
 	else
 		cout << "No";
+
+	bool isR = g.isReachable(0, 3);
+	cout << "is 0, 3 reachable?\n";
+	if (isR)
+		cout << "Yes\n"; 
+	else
+		cout << "No\n";
 }
