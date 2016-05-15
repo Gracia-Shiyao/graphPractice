@@ -2,13 +2,14 @@
 #include <list>
 #include <queue>
 #include <stack>
+#include <vector>
 using namespace std;
 
 class Graph {
 	int V; //No. of vertex
 	list<int> * adj;
 	void DFSUtil(int v, bool visited[]);
-	void topoSortUtil(int v, bool visited[], stack<int>& S);
+//	void topoSortUtil(int v, bool visited[], stack<int>& S);
 public:
 	Graph(int v);
 	void addEdge(int v, int w);
@@ -89,6 +90,7 @@ void Graph::BFS(int s) {
   topoSortUtil on its adjcent vertex which are not visited yet, push them into stack.
   After reviewing all adjacent vertex, push the vertex v into stack.
 */
+/*
 void Graph::topoSortUtil(int v, bool visited[], stack<int>& stk) {
 	visited[v] = true;
 
@@ -101,8 +103,10 @@ void Graph::topoSortUtil(int v, bool visited[], stack<int>& stk) {
 
 	stk.push(v);
 }
+*/
 /*in recursive topoSort method, initialize the stack, then call the recursive helper function
   to store Topological Sort start from all vertices one-by-one*/
+/*
 void Graph::topologicalSort() {
 	stack<int> stk;
 
@@ -123,6 +127,52 @@ void Graph::topologicalSort() {
 		cout << stk.top() << " ";
 		stk.pop();
 	}
+}
+*/
+/*Kahn's algorithm for topological sort*/
+void Graph::topologicalSort() {
+	//create a vector to store in-degree of all vertices. Initialize all 0
+	vector<int> in_degree(V, 0);
+
+	//to fill the indegree of vertices
+	for (int u = 0; u < V; ++u) {
+		list<int>::iterator iter;
+		for (iter = adj[u].begin(); iter != adj[u].end(); ++iter) {
+			in_degree[*iter]++;
+		}
+	}
+
+	//create a queue and enqueue all vertices with 0 indegree
+	queue<int> q;
+	for (int i = 0; i < V; i++) {
+		if (in_degree[i] == 0)
+			q.push(i);
+	}
+	//count of visited vertex
+	int cnt = 0;
+	vector<int> topoOrder;
+	while (!q.empty()) {
+		int u = q.front();
+		q.pop();
+		topoOrder.push_back(u);
+		list<int>::iterator iter;
+		for (iter = adj[u].begin(); iter != adj[u].end(); ++iter) {
+			if (--in_degree[*iter] == 0) {
+				q.push(*iter);
+			}
+		}
+		cnt++;
+	}
+
+	if (cnt != V) {
+		cout << "There is a cycle in the graph" << endl;
+		return;
+	}
+
+	for (int i = 0; i < topoOrder.size(); ++i) {
+		cout << topoOrder[i] << " ";
+	}
+	cout << endl;
 }
 int main() {
 	Graph g{ 6 };
