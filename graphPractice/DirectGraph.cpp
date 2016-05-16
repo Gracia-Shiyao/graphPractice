@@ -10,7 +10,8 @@ using namespace std;
 
 class DirectGraph : protected Graph {
 	
-//	void DFSUtil(int v, bool visited[]);
+	void DFSUtil(int v, bool visited[]);
+	void fillOrder(int v, bool visited[], stack<int>& Stack);
 //	void topoSortUtil(int v, bool visited[], stack<int>& S);
 //	bool isCyclicUtil(int v, bool visited[], bool *rs);
 public:
@@ -18,6 +19,8 @@ public:
 	};
 	void addEdge(int u, int v, int w);
 	void bellmanfordShortestPath(int s);
+	void printSCCs();
+	DirectGraph getTranspose();
 /*	void DFS(int v); //start point of dfs
 	void DFS();
 	void BFS(int v); //start with vertex v
@@ -26,7 +29,7 @@ public:
 	*/
 };          
 
-void DirectGraph::addEdge(int u, int v, int w) {
+void DirectGraph::addEdge(int u, int v, int w = 1) {
 	adj[u].push_back(make_pair(v, w));
 }
 
@@ -67,6 +70,74 @@ void DirectGraph::bellmanfordShortestPath(int src) {
 	//print result
 	for (int u = 0; u < V; u++) {
 		printf("%d \t\t %d\n", u, dist[u]);
+	}
+}
+void DirectGraph::DFSUtil(int v, bool visited[]) {
+	visited[v] = true;
+	cout << v << " ";
+	list<pair<int, int>>::iterator i;
+	for (i = adj[v].begin(); i != adj[v].end(); ++i) {
+		int u = (*i).first;
+		if (!visited[u])
+			DFSUtil(u, visited);
+	}
+}
+void DirectGraph::fillOrder(int v, bool visited[], stack<int>& Stack) {
+	//mark the current node as visited 
+	visited[v] = true;
+	list<pair<int, int>>::iterator i;
+	for (i = adj[v].begin(); i != adj[v].end(); i++) {
+		if (!visited[(*i).first]) {
+			fillOrder((*i).first, visited, Stack);
+		}
+	}
+	Stack.push(v);
+}
+DirectGraph DirectGraph::getTranspose() {
+	DirectGraph transg{ V };
+	for (int v = 0; v < V; v++) {
+		list<pair<int, int>>::iterator i;
+		for (i = adj[v].begin(); i != adj[v].end(); ++i)
+		{
+			int u = (*i).first;
+			transg.addEdge(u, v, 1);
+		}
+	}
+
+	return transg;
+}
+
+/*The main function implement Kosaraju's algorithm to print all SCCs*/
+void DirectGraph::printSCCs() {
+	stack<int> stk;
+	bool * visited = new bool[V];
+
+	for (int i = 0; i < V; ++i) {
+		visited[i] = false;
+	}
+
+	//Step 1, fill vertices in stack according to their finished times
+	for (int i = 0; i < V; ++i) {
+		if (!visited[i]) {
+			fillOrder(i, visited, stk);
+		}
+	}
+
+	//Create a reverse graph
+	DirectGraph gr = getTranspose();
+	//mark all the vertices as not visited
+	for (int i = 0; i < V; ++i) {
+		visited[i] = false;
+	}
+
+	//step 3, process all vertices in order defined by stack
+	while (stk.empty() == false) {
+		int v = stk.top();
+		stk.pop();
+		if (visited[v] == false) {
+			gr.DFSUtil(v, visited);
+			cout << endl;
+		}
 	}
 }
 /*
@@ -284,14 +355,26 @@ int main() {
 
 int main() {
 	DirectGraph g{ 5 };
+	/*
 	g.addEdge(0, 1, -1);
 	g.addEdge(0, 2, 4);
 	g.addEdge(1, 2, 3);
 	g.addEdge(1, 3, 2);
 	g.addEdge(1, 4, 2);
-	g.addEdge(3, 1, 1);
+	g.addEdge(3, 1);
 	g.addEdge(3, 2, 5);
 	g.addEdge(4, 3, -3);
 
 	g.bellmanfordShortestPath(0);
+	*/
+	g.addEdge(1, 0);
+	g.addEdge(0, 2);
+	g.addEdge(2, 1);
+	g.addEdge(0, 3);
+	g.addEdge(3, 4);
+
+	cout << endl;
+	g.printSCCs();
+
+	return 0;
 }
