@@ -5,6 +5,7 @@
 #include <vector>
 #include <climits>
 #include <cstdio>
+#include "unionFind.h"
 #include "Graph.h"
 using namespace std;
 
@@ -21,6 +22,7 @@ public:
 	void bellmanfordShortestPath(int s);
 	void printSCCs();
 	DirectGraph getTranspose();
+	int kruskalMST(); //return the total weight of MST
 /*	void DFS(int v); //start point of dfs
 	void DFS();
 	void BFS(int v); //start with vertex v
@@ -106,7 +108,39 @@ DirectGraph DirectGraph::getTranspose() {
 
 	return transg;
 }
+int DirectGraph::kruskalMST() {
+	//collect the edges into vector
+	typedef pair<int, int> iPair;
+	vector<pair<int, iPair>> edges; //<weight, <src, dest>
+	for (int v = 0; v < V; ++v) {
+		list<pair<int, int>>::iterator iter;
+		for (iter = adj[v].begin(); iter != adj[v].end(); ++iter)
+		{
+			edges.push_back(make_pair((*iter).second, make_pair(v, (*iter).first)));
+		}
+	}
 
+	int mst_wt = 0;
+	sort(edges.begin(), edges.end());
+
+	DisjointSets ds(V);
+	vector<pair<int, iPair>>::iterator it;
+	for (it = edges.begin(); it != edges.end(); ++it)
+	{
+		int u = it->second.first;
+		int v = it->second.second; 
+
+		int set_u = ds.find(u);
+		int set_v = ds.find(v);
+
+		if (set_u != set_v) {
+			cout << u << " - " << v << endl;
+			mst_wt += it->first;
+			ds.merge(u, v);
+		}
+	}
+	return mst_wt;
+}
 /*The main function implement Kosaraju's algorithm to print all SCCs*/
 void DirectGraph::printSCCs() {
 	stack<int> stk;
@@ -376,5 +410,8 @@ int main() {
 	cout << endl;
 	g.printSCCs();
 
+	cout << endl;
+
+	g.kruskalMST();
 	return 0;
 }
